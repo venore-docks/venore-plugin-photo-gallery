@@ -6,6 +6,7 @@ export type UpdateGalleryCommand = {
   title: string;
   category?: string | null;
   description?: string | null;
+  eventDate?: string | null;
   status: GalleryStatus;
   actorId: string;
 };

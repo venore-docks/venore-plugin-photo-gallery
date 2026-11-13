@@ -13,20 +13,15 @@ export async function applyGalleryUpdate(input: {
   title: string;
   category: string | null;
   description: string | null;
+  eventDate: string | null;
   status: GalleryRecord["status"];
   publishedAt: Date | null;
 }): Promise<GalleryRecord> {
+  const { id, ...values } = input;
   const [row] = await db
     .update(photoGalleries)
-    .set({
-      title: input.title,
-      category: input.category,
-      description: input.description,
-      status: input.status,
-      publishedAt: input.publishedAt,
-      updatedAt: sql`now()`,
-    })
-    .where(eq(photoGalleries.id, input.id))
+    .set({ ...values, updatedAt: sql`now()` })
+    .where(eq(photoGalleries.id, id))
     .returning();
 
   return row as GalleryRecord;

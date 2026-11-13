@@ -1,7 +1,7 @@
 {
   "name": "@venore/plugin-photo-gallery",
-  "version": "1.0.0",
-  "description": "Galerias de fotos por categoria, com upload direto e bloco de pagina (plugin do Venore Docks).",
+  "version": "2.0.0",
+  "description": "Galerias de fotos da biblioteca de midia (MMS), com capa, ordem, legendas, lightbox e bloco de pagina (plugin do Venore Docks).",
   "private": true,
   "type": "module",
   "exports": {

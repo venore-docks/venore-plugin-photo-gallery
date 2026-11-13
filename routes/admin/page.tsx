@@ -1,9 +1,7 @@
 import { Images } from "lucide-react";
 import { listGalleries } from "../../index";
 import { getPluginAdminPageData } from "@venore/plugin-sdk/admin";
-import { AdminAccessDenied } from "@venore/plugin-sdk/ui";
-import { AdminPageHeader } from "@venore/plugin-sdk/ui";
-import { EmptyState } from "@venore/plugin-sdk/ui";
+import { AdminAccessDenied, AdminPageHeader, EmptyState } from "@venore/plugin-sdk/ui";
 import { CreateGalleryDialog } from "./create-gallery-dialog";
 import { GalleryTable } from "./gallery-table";
 
@@ -25,7 +23,7 @@ export default async function PhotoGalleryAdminPage() {
     <div className="space-y-8">
       <AdminPageHeader
         title="Galeria de fotos"
-        description="Galerias com status 'Publicada' aparecem em /galerias. Fotos são adicionadas na tela de cada galeria."
+        description="Galerias publicadas aparecem em /galerias. As fotos ficam na biblioteca de mídia e podem ser reaproveitadas."
         actions={galleries.length > 0 && <CreateGalleryDialog />}
       />
 

@@ -1,26 +1,29 @@
-import { asc, desc, eq } from "drizzle-orm";
+import { and, desc, eq, getTableColumns, sql } from "drizzle-orm";
 import { db } from "@venore/plugin-sdk";
-import { photoGalleries, photoGalleryPhotos } from "../../database/schema";
-import type { GalleryRecord, GalleryPhotoRecord } from "../../contracts/types";
+import { photoGalleries } from "../../database/schema";
+import { coverMediaIdColumn, photoCountColumn } from "../../shared/gallery-sql";
+import type { GalleryWithStatsRow } from "../list-galleries/store";
 
-export async function findPublishedGalleries(): Promise<GalleryRecord[]> {
+// Galerias publicadas com contagem e capa numa consulta só (antes: 1 consulta de capa + 1
+// getMediaAsset por galeria). Ordem: data do evento e, sem ela, a de publicação — mais recente
+// primeiro.
+export async function findPublishedGalleriesWithStats(filter: {
+  category: string | null;
+  limit: number;
+}): Promise<GalleryWithStatsRow[]> {
   const rows = await db
-    .select()
+    .select({ ...getTableColumns(photoGalleries), photoCount: photoCountColumn, coverMediaId: coverMediaIdColumn })
     .from(photoGalleries)
-    .where(eq(photoGalleries.status, "published"))
-    .orderBy(desc(photoGalleries.publishedAt));
-  return rows as GalleryRecord[];
-}
-
-// Primeira foto (menor `order`) de cada galeria — usada como capa na listagem pública. Uma
-// query por galeria é aceitável no volume esperado deste plugin (dezenas de galerias, não
-// milhares); otimizar com uma única query agregada fica pra quando/se isso virar gargalo real.
-export async function findFirstPhotoByGalleryId(galleryId: string): Promise<GalleryPhotoRecord | null> {
-  const [row] = await db
-    .select()
-    .from(photoGalleryPhotos)
-    .where(eq(photoGalleryPhotos.galleryId, galleryId))
-    .orderBy(asc(photoGalleryPhotos.order))
-    .limit(1);
-  return (row as GalleryPhotoRecord) ?? null;
+    .where(
+      and(
+        eq(photoGalleries.status, "published"),
+        filter.category ? sql`lower(${photoGalleries.category}) = lower(${filter.category})` : undefined,
+      ),
+    )
+    .orderBy(
+      desc(sql`coalesce(${photoGalleries.eventDate}, (${photoGalleries.publishedAt})::date)`),
+      desc(photoGalleries.publishedAt),
+    )
+    .limit(filter.limit);
+  return rows as GalleryWithStatsRow[];
 }

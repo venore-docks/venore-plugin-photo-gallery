@@ -7,6 +7,9 @@ export type GalleryRecord = {
   category: string | null;
   description: string | null;
   status: GalleryStatus;
+  // "YYYY-MM-DD" (coluna date) — data do evento, não da publicação.
+  eventDate: string | null;
+  coverPhotoId: string | null;
   publishedAt: Date | null;
   createdByUserId: string | null;
   createdAt: Date;
@@ -21,3 +24,5 @@ export type GalleryPhotoRecord = {
   order: number;
   createdAt: Date;
 };
+
+export type PhotoGalleryError = { code: string; message: string };

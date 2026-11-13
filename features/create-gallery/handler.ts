@@ -1,10 +1,10 @@
 import { authorizeActor } from "@venore/plugin-sdk/rbac";
+import { validateGalleryFields } from "../../shared/validation";
 import { createGallery } from "./service";
-import { validateCreateGalleryInput } from "./validation";
 import type { CreateGalleryInput, CreateGalleryResult } from "./types";
 
 export async function createGalleryHandler(input: CreateGalleryInput): Promise<CreateGalleryResult> {
-  const validationError = validateCreateGalleryInput(input);
+  const validationError = validateGalleryFields(input);
   if (validationError) {
     return { success: false, error: validationError };
   }

@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ExternalLink } from "lucide-react";
 import { getPluginAdminPageData } from "@venore/plugin-sdk/admin";
-import { AdminAccessDenied } from "@venore/plugin-sdk/ui";
-import { AdminPageHeader } from "@venore/plugin-sdk/ui";
-import { Button } from "@venore/plugin-sdk/ui";
-import { listGalleries, listGalleryPhotos } from "../../../index";
-import { UploadPhotosForm } from "../upload-photos-form";
-import { PhotoGrid } from "../photo-grid";
+import { AdminAccessDenied, AdminPageHeader, Badge, Button } from "@venore/plugin-sdk/ui";
+import { getGallery, listGalleryPhotos } from "../../../index";
+import { formatEventDate } from "../../../shared/format";
+import { AddPhotosPanel } from "../add-photos-panel";
+import { PhotoManager } from "../photo-manager";
+import { EditGalleryDialog } from "../edit-gallery-dialog";
+import { DeleteGalleryButton } from "../delete-gallery-button";
 
 export const dynamic = "force-dynamic";
 
@@ -18,17 +19,19 @@ export default async function PhotoGalleryDetailAdminPage({ params }: { params: 
   }
 
   const { id } = await params;
+  const [galleryResult, photosResult] = await Promise.all([getGallery({ galleryId: id }), listGalleryPhotos({ galleryId: id })]);
 
-  const [galleriesResult, photosResult] = await Promise.all([listGalleries(), listGalleryPhotos({ galleryId: id })]);
-
-  if (!galleriesResult.success || !photosResult.success) {
+  if (!galleryResult.success || !photosResult.success) {
     return <p className="text-sm text-destructive">Erro ao carregar a galeria.</p>;
   }
 
-  const gallery = galleriesResult.data.find((item) => item.id === id);
+  const gallery = galleryResult.data;
   if (!gallery) {
     notFound();
   }
+
+  const photos = photosResult.data;
+  const subtitle = [gallery.category, gallery.eventDate ? formatEventDate(gallery.eventDate) : null].filter(Boolean).join(" · ");
 
   return (
     <div className="space-y-6">
@@ -39,10 +42,30 @@ export default async function PhotoGalleryDetailAdminPage({ params }: { params: 
         </Link>
       </Button>
 
-      <AdminPageHeader title={gallery.title} description="Envie fotos e organize o que aparece nesta galeria." />
+      <AdminPageHeader
+        title={gallery.title}
+        description={subtitle || "Envie fotos, escolha a capa e organize a ordem da galeria."}
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant={gallery.status === "published" ? "default" : "secondary"}>
+              {gallery.status === "published" ? "Publicada" : "Rascunho"}
+            </Badge>
+            {gallery.status === "published" && (
+              <Button variant="outline" asChild>
+                <Link href={`/galerias/${gallery.slug}`} target="_blank">
+                  <ExternalLink className="size-4" />
+                  Ver página
+                </Link>
+              </Button>
+            )}
+            <EditGalleryDialog gallery={gallery} withLabel />
+            <DeleteGalleryButton galleryId={gallery.id} title={gallery.title} redirectToList />
+          </div>
+        }
+      />
 
-      <UploadPhotosForm galleryId={gallery.id} />
-      <PhotoGrid photos={photosResult.data} galleryId={gallery.id} />
+      <AddPhotosPanel galleryId={gallery.id} mediaIdsInGallery={photos.map((photo) => photo.mediaId)} />
+      <PhotoManager galleryId={gallery.id} photos={photos} coverPhotoId={gallery.coverPhotoId} />
     </div>
   );
 }

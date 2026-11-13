@@ -10,12 +10,16 @@ export const photoGalleryGridBlockDefinition: BlockDefinition = {
     title: "Galeria de fotos",
     description: "",
     emptyMessage: "Nenhuma galeria publicada no momento.",
+    category: "",
     limit: 6,
+    showAllLink: true,
   },
   editorFields: [
     { name: "title", type: "text", label: "Título" },
     { name: "description", type: "richtext", label: "Descrição (opcional)" },
-    { name: "emptyMessage", type: "richtext", label: "Mensagem quando não há galerias" },
+    { name: "category", type: "text", label: "Só galerias da categoria (opcional, ex.: Eventos)" },
     { name: "limit", type: "number", label: "Quantidade máxima exibida" },
+    { name: "showAllLink", type: "boolean", label: "Mostrar link “Ver todas as galerias”" },
+    { name: "emptyMessage", type: "richtext", label: "Mensagem quando não há galerias" },
   ],
 };

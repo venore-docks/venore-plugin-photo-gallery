@@ -17,6 +17,6 @@ export async function findPhotosByGalleryId(galleryId: string): Promise<GalleryP
     .select()
     .from(photoGalleryPhotos)
     .where(eq(photoGalleryPhotos.galleryId, galleryId))
-    .orderBy(asc(photoGalleryPhotos.order));
+    .orderBy(asc(photoGalleryPhotos.order), asc(photoGalleryPhotos.createdAt));
   return rows as GalleryPhotoRecord[];
 }

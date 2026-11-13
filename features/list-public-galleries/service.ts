@@ -1,30 +1,30 @@
-import { getMediaAsset } from "@venore/plugin-sdk/media";
-import { findFirstPhotoByGalleryId, findPublishedGalleries } from "./store";
-import type { ListPublicGalleriesResult, PublicGalleryView } from "./types";
+import { CARD_DISPLAY_WIDTH, loadMediaUrls } from "../../shared/media-urls";
+import { findPublishedGalleriesWithStats } from "./store";
+import type { ListPublicGalleriesInput, ListPublicGalleriesResult } from "./types";
 
-export async function listPublicGalleries(): Promise<ListPublicGalleriesResult> {
-  const galleries = await findPublishedGalleries();
+export const PUBLIC_GALLERIES_MAX = 100;
 
-  const views: PublicGalleryView[] = await Promise.all(
-    galleries.map(async (gallery) => {
-      const coverPhoto = await findFirstPhotoByGalleryId(gallery.id);
-      const coverMediaUrl = coverPhoto ? await resolveMediaUrl(coverPhoto.mediaId) : null;
+export async function listPublicGalleries(input: ListPublicGalleriesInput = {}): Promise<ListPublicGalleriesResult> {
+  const requested = Number.isFinite(input.limit) ? Math.trunc(input.limit as number) : PUBLIC_GALLERIES_MAX;
+  const limit = Math.min(Math.max(requested, 1), PUBLIC_GALLERIES_MAX);
+  const rows = await findPublishedGalleriesWithStats({ category: input.category?.trim() || null, limit });
 
-      return {
-        id: gallery.id,
-        title: gallery.title,
-        slug: gallery.slug,
-        category: gallery.category,
-        coverMediaUrl,
-        publishedAt: gallery.publishedAt,
-      };
-    }),
+  const urls = await loadMediaUrls(
+    rows.flatMap((row) => (row.coverMediaId ? [row.coverMediaId] : [])),
+    CARD_DISPLAY_WIDTH,
   );
 
-  return { success: true, data: views };
-}
-
-async function resolveMediaUrl(mediaId: string): Promise<string | null> {
-  const result = await getMediaAsset({ id: mediaId });
-  return result.success && result.data ? result.data.url : null;
+  return {
+    success: true,
+    data: rows.map((row) => ({
+      id: row.id,
+      title: row.title,
+      slug: row.slug,
+      category: row.category,
+      eventDate: row.eventDate,
+      publishedAt: row.publishedAt,
+      photoCount: row.photoCount,
+      coverUrl: row.coverMediaId ? (urls[row.coverMediaId] ?? null) : null,
+    })),
+  };
 }

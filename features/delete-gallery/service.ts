@@ -11,7 +11,7 @@ export async function deleteGallery(command: DeleteGalleryCommand): Promise<Dele
 
   const deleted = await deleteGalleryById(command.galleryId);
   if (!deleted) {
-    const error = { code: "photo-gallery.not_found", message: `Galeria "${command.galleryId}" não encontrada.` };
+    const error = { code: "photo-gallery.not_found", message: "Galeria não encontrada." };
     endOperation(handle, { success: false, error });
     return { success: false, error };
   }

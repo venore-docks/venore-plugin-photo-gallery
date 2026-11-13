@@ -2,8 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { Pencil } from "lucide-react";
-import { Button } from "@venore/plugin-sdk/ui";
-import { useActionToast } from "@venore/plugin-sdk/ui";
+import { Button, useActionToast } from "@venore/plugin-sdk/ui";
 import {
   Dialog,
   DialogContent,
@@ -18,7 +17,7 @@ import type { GalleryRecord } from "../../index";
 
 const initialState: GalleryActionState = { error: null };
 
-export function EditGalleryDialog({ gallery }: { gallery: GalleryRecord }) {
+export function EditGalleryDialog({ gallery, withLabel = false }: { gallery: GalleryRecord; withLabel?: boolean }) {
   const [open, setOpen] = useState(false);
   const [state, formAction, pending] = useActionState(updateGalleryAction, initialState);
   useActionToast({ pending, error: state.error, successMessage: "Galeria atualizada.", onSuccess: () => setOpen(false) });
@@ -26,9 +25,16 @@ export function EditGalleryDialog({ gallery }: { gallery: GalleryRecord }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label={`Editar ${gallery.title}`}>
-          <Pencil className="size-4" />
-        </Button>
+        {withLabel ? (
+          <Button variant="outline">
+            <Pencil className="size-4" />
+            Editar dados
+          </Button>
+        ) : (
+          <Button variant="ghost" size="icon" aria-label={`Editar ${gallery.title}`}>
+            <Pencil className="size-4" />
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -41,6 +47,7 @@ export function EditGalleryDialog({ gallery }: { gallery: GalleryRecord }) {
             defaultTitle={gallery.title}
             defaultCategory={gallery.category ?? ""}
             defaultDescription={gallery.description ?? ""}
+            defaultEventDate={gallery.eventDate ?? ""}
             defaultStatus={gallery.status}
           />
           <Button type="submit" disabled={pending} className="w-full">

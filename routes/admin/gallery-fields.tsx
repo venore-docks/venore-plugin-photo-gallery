@@ -6,28 +6,37 @@ export function GalleryFields({
   defaultTitle = "",
   defaultCategory = "",
   defaultDescription = "",
+  defaultEventDate = "",
   defaultStatus = "draft",
 }: {
   defaultTitle?: string;
   defaultCategory?: string;
   defaultDescription?: string;
+  defaultEventDate?: string;
   defaultStatus?: string;
 }) {
   return (
     <>
       <label className="flex flex-col gap-1 text-sm text-muted-foreground">
         Título
-        <Input name="title" defaultValue={defaultTitle} placeholder="ex.: Festa junina 2026" required />
+        <Input name="title" defaultValue={defaultTitle} placeholder="ex.: Festa junina 2026" maxLength={200} required />
       </label>
 
-      <label className="flex flex-col gap-1 text-sm text-muted-foreground">
-        Categoria (opcional)
-        <Input name="category" defaultValue={defaultCategory} placeholder="ex.: Eventos" />
-      </label>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <label className="flex flex-col gap-1 text-sm text-muted-foreground">
+          Categoria (opcional)
+          <Input name="category" defaultValue={defaultCategory} placeholder="ex.: Eventos" maxLength={80} />
+        </label>
+
+        <label className="flex flex-col gap-1 text-sm text-muted-foreground">
+          Data do evento (opcional)
+          <Input name="eventDate" type="date" defaultValue={defaultEventDate} />
+        </label>
+      </div>
 
       <label className="flex flex-col gap-1 text-sm text-muted-foreground">
         Descrição (opcional)
-        <Textarea name="description" defaultValue={defaultDescription} rows={3} />
+        <Textarea name="description" defaultValue={defaultDescription} rows={3} maxLength={4000} />
       </label>
 
       <label className="flex flex-col gap-1 text-sm text-muted-foreground">

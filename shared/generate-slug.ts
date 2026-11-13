@@ -1,9 +1,13 @@
-// Slug determinístico a partir do título — mesmo helper de venore-plugin-vagas/shared/generate-slug.ts.
+// Slug determinístico a partir do título. Acento sai sem levar a letra junto ("Ação" -> "acao");
+// qualquer sequência de pontuação/espaço vira UM hífen ("Festa - 2026" -> "festa-2026", não
+// "festa---2026"), e "Jun.2026" não gruda em "jun2026".
 export function generateGallerySlug(title: string): string {
   return title
-    .normalize("NFKD")
-    .replace(/[^\w\s-]+/g, "")
-    .trim()
-    .replace(/\s+/g, "-")
-    .toLowerCase();
+    .normalize("NFD")
+    .replace(/\p{M}+/gu, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80)
+    .replace(/-+$/g, "");
 }

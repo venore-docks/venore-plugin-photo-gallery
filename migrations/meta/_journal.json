@@ -8,6 +8,13 @@
       "when": 1789875955196,
       "tag": "0000_keen_sentry",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794574400256,
+      "tag": "0001_cover_event_date",
+      "breakpoints": true
     }
   ]
 }
