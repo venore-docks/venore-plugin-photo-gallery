@@ -6,7 +6,7 @@ export const photoGalleryManifest: PluginManifest = {
   manifestVersion: "1.0.0",
   key: "photo-gallery",
   name: "Galeria de fotos",
-  version: "2.0.0",
+  version: "2.1.0",
   description: "Galerias de fotos da biblioteca de mídia (MMS), com capa, ordem, legendas e lightbox.",
   compatibility: { coreVersion: ">=2.0.0 <3.0.0" },
   // Schema próprio do plugin — aplicado no install (run-plugin-migrations.ts), não no
@@ -31,5 +31,8 @@ export const photoGalleryManifest: PluginManifest = {
     },
   ],
   seeds: [],
-  blocks: [{ key: "photo-gallery.grid", label: "Galeria de fotos — Grade de galerias" }],
+  blocks: [
+    { key: "photo-gallery.grid", label: "Galeria de fotos — Grade de galerias" },
+    { key: "photo-gallery.album", label: "Galeria de fotos — Fotos de uma galeria" },
+  ],
 };
